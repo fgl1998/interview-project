@@ -20,6 +20,7 @@ const pageFiles = [
   'pages/profile/relation.vue',
   'pages/profile/detail.vue',
   'pages/my/my.vue',
+  'pages/my/edit.vue',
 ]
 
 test('page scripts are valid JavaScript and all relative requires resolve', () => {
@@ -92,8 +93,8 @@ test('article creation page loads tags and posts the current backend contract', 
 
   assert.match(source, /tagApi\.list\(\)/)
   assert.match(source, /articleApi\.create\(/)
-  assert.match(source, /tags:\s*JSON\.stringify\(this\.selectedTagIds\)/)
-  assert.match(source, /encodeURIComponent\(article\.slug\)/)
+  assert.match(source, /tagsId:\s*this\.selectedTagIds/)
+  assert.match(source, /pages\/article\/list\?type=mine/)
   assert.match(home, /pages\/article\/create/)
 })
 

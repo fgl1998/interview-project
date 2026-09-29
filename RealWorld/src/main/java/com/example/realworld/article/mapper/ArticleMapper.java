@@ -29,6 +29,20 @@ public interface ArticleMapper {
     int insertArticleTags(@Param("articleId") Long articleId, @Param("tagIds") List<Long> tagIds);
 
     @Select("""
+            <script>
+            SELECT at.article_id AS articleId, at.tag_id AS tagId, t.name
+            FROM article_tags at
+            JOIN tags t ON t.id=at.tag_id
+            WHERE at.article_id IN
+            <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+                #{articleId}
+            </foreach>
+            ORDER BY at.article_id, t.id
+            </script>
+            """)
+    List<ArticleTag> queryArticleTags(@Param("articleIds") List<Long> articleIds);
+
+    @Select("""
             SELECT
                     a.id,
                     a.slug,
@@ -81,16 +95,20 @@ public interface ArticleMapper {
                     users.username AS author_username,
                     users.bio AS author_bio,
                     users.image AS author_image,
-                        
+                    EXISTS(
+                        SELECT 1 FROM favorites f
+                        WHERE f.user_id=#{userId} AND f.article_id=articles.id
+                    ) AS favorited,
                     (
                     SELECT COUNT(*) FROM favorites WHERE favorites.article_id=articles.id
                     ) AS favorites_count
                         
                   FROM articles
                   JOIN users ON users.id=articles.author_id
-                  WHERE articles.author_id=#{authorId}  
+                  WHERE articles.author_id=#{authorId}
+                  ORDER BY articles.created_at DESC, articles.id DESC
             """)
-    List<ArticleQueryRow> queryArticlesByAuthorId(Long authorId);
+    List<ArticleQueryRow> queryArticlesByAuthorId(@Param("userId") Long userId, @Param("authorId") Long authorId);
 
     @Select("""
             SELECT

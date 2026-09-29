@@ -3,6 +3,48 @@ const assert = require('node:assert/strict')
 
 const { createHttpClient, createUnauthorizedHandler } = require('../common/http')
 
+test('Java HTTP 200 business 401 expires the current session', async () => {
+  let unauthorizedCount = 0
+  const client = createHttpClient({
+    getToken: () => 'expired-token',
+    requestAdapter: async () => ({ statusCode: 200, data: { success: false, code: 401, message: '登录已过期', data: null } }),
+    onUnauthorized: () => { unauthorizedCount += 1 },
+  })
+  await assert.rejects(client.request('/api/articles/queryArticles'), { message: '登录已过期', code: 401, statusCode: 200 })
+  assert.equal(unauthorizedCount, 1)
+})
+
+test('a delayed Java business 401 cannot clear a newer session', async () => {
+  let token = 'old-token'
+  let unauthorizedCount = 0
+  const client = createHttpClient({
+    getToken: () => token,
+    requestAdapter: async () => {
+      token = 'new-token'
+      return { statusCode: 200, data: { success: false, code: 401, message: '登录已过期', data: null } }
+    },
+    onUnauthorized: () => { unauthorizedCount += 1 },
+  })
+  await assert.rejects(client.request('/api/users/7'), /登录已过期/)
+  assert.equal(unauthorizedCount, 0)
+})
+
+test('GET user lookup supports a same-origin H5 base URL and authorization', async () => {
+  let received
+  const client = createHttpClient({
+    baseUrl: '',
+    getToken: () => 'java-token',
+    requestAdapter: async (options) => {
+      received = options
+      return { statusCode: 200, data: { success: true, code: 200, message: 'success', data: { id: 7 } } }
+    },
+  })
+  assert.deepEqual(await client.request('/api/users/7', {}, { method: 'GET' }), { id: 7 })
+  assert.equal(received.method, 'GET')
+  assert.equal(received.url, '/api/users/7')
+  assert.equal(received.header.Authorization, 'Bearer java-token')
+})
+
 test('request forwards an explicit timeout without changing default requests', async () => {
   let received
   const client = createHttpClient({

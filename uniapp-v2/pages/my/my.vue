@@ -9,14 +9,17 @@
     <template v-else>
       <view class="profile-card">
         <view class="profile-header">
-          <view class="avatar">{{ avatarText }}</view>
+          <view class="avatar">
+            <image v-if="userInfo.image && !avatarFailed" class="avatar-image" :src="userInfo.image" mode="aspectFill" @error="avatarFailed = true" />
+            <text v-else>{{ avatarText }}</text>
+          </view>
           <view class="profile-main">
             <view class="username">{{ userInfo.username || '未设置用户名' }}</view>
             <view class="profile-bio">{{ userInfo.bio || '这个人很低调，还没有填写简介。' }}</view>
             <view v-if="refreshing" class="refreshing">正在同步最新资料…</view>
           </view>
         </view>
-        <view class="email" @click="test">{{ userInfo.email || '未填写邮箱' }}</view>
+        <view class="email">{{ userInfo.email || '未填写邮箱' }}</view>
       </view>
 
       <view class="stats-card">
@@ -35,6 +38,13 @@
       </view>
 
       <view class="menu-card">
+        <view class="menu-item" @click="openEditProfile">
+          <view>
+            <view class="menu-title">编辑个人信息</view>
+            <view class="menu-copy">修改邮箱、简介、头像和密码</view>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
         <view class="menu-item" @click="openArticleList('mine')">
           <view>
             <view class="menu-title">我的文章</view>
@@ -88,6 +98,7 @@ export default {
       relationStatsLoading: false,
       relationStatsError: '',
       userInfo: {},
+      avatarFailed: false,
       stats: emptyStats(),
       profileRequestGeneration: 0,
       activeSessionToken: '',
@@ -103,39 +114,6 @@ export default {
     this.restoreAndRefresh()
   },
   methods: {
-		test(){
-			uni.request({
-			  url:"http://localhost:3002/api/agent/history",
-			  method:'POST',
-			  header:{
-			    'Content-Type':'application/json',
-			    'Accept':'application/json',
-			    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImlhdCI6MTc4ODMxOTE3MywiZXhwIjoxNzg4OTIzOTczfQ.XsYQO1VOJ8njTqqKQedj8JTSA_79Hg_PAXILjjUbPF8"
-			   //  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUsImlhdCI6MTc4NzEwNDc3NiwiZXhwIjoxNzg3NzA5NTc2fQ.coPpvxmRJTC_M51dsI453Z-bnHWKnbF9GbhMXIkD8mg"
-			  },
-			  data:{
-			   //  email:'wangwu44444@169.com',
-			   //  username:'wangwu4',
-			   //  password:'1234567888'
-			   // articleId:34,
-			   // body:'测试评论'
-			   // commentId:1
-			   // followingId:7
-			   // page:1,
-			   // pageSize:3
-			   // userId:14
-			
-			   // title:'测试标题826',
-			   // description:'测试  描述826',
-			   // body:'测试内容826',
-			   // slug:'测试标题825-624a345a',
-			   // tags:JSON.stringify([1])
-			   // slug:'vue-getting-started'
-			   
-			
-			  }
-			})
-		},
     async restoreAndRefresh() {
       const generation = ++this.profileRequestGeneration
       const cached = session.get()
@@ -146,6 +124,7 @@ export default {
       this.activeSessionUserId = cachedUserId
       this.isLoggedIn = Boolean(cached.token)
       this.userInfo = cached.user || {}
+      this.avatarFailed = false
 
       if (sessionChanged) {
         this.stats = emptyStats()
@@ -164,6 +143,7 @@ export default {
         const user = await userApi.getUser()
         if (generation !== this.profileRequestGeneration || session.getToken() !== requestToken) return
         this.userInfo = user || {}
+        this.avatarFailed = false
         this.activeSessionUserId = Number(this.userInfo.id) || 0
         session.setUser(this.userInfo)
         await this.refreshRelationStats(this.userInfo.id, generation, requestToken)
@@ -224,6 +204,9 @@ export default {
     goLogin() {
       uni.navigateTo({ url: '/pages/login/login' })
     },
+    openEditProfile() {
+      uni.navigateTo({ url: '/pages/my/edit' })
+    },
     openAgent() {
       uni.navigateTo({ url: '/pages/agent/chat' })
     },
@@ -265,6 +248,7 @@ export default {
 .profile-card { padding: 36rpx 32rpx; }
 .profile-header { display: flex; align-items: center; }
 .avatar { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 104rpx; height: 104rpx; margin-right: 24rpx; color: #fff; font-size: 42rpx; font-weight: 700; background: linear-gradient(135deg, #3c9cff, #7a74ff); border-radius: 50%; }
+.avatar-image { width: 100%; height: 100%; border-radius: 50%; }
 .profile-main { min-width: 0; }
 .username { color: #303133; font-size: 38rpx; font-weight: 650; }
 .profile-bio { overflow: hidden; margin-top: 9rpx; color: #606266; font-size: 25rpx; text-overflow: ellipsis; white-space: nowrap; }

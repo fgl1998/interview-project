@@ -1,6 +1,7 @@
 package com.example.realworld.article.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArticleQueryRow {
     private Long id;
@@ -18,6 +19,15 @@ public class ArticleQueryRow {
 
     private Boolean favorited;
     private Long favoritesCount;
+    private List<String> tags = List.of();
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
 
     public ArticleQueryRow() {
     }

@@ -3,6 +3,7 @@ package com.example.realworld.article.service;
 import com.example.realworld.article.dto.CreateArticleRequest;
 import com.example.realworld.article.entity.Article;
 import com.example.realworld.article.entity.ArticleQueryRow;
+import com.example.realworld.article.entity.ArticleTag;
 import com.example.realworld.article.entity.CommentQueryRow;
 import com.example.realworld.article.mapper.ArticleMapper;
 import com.example.realworld.common.PageResult;
@@ -13,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.transform.Result;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
@@ -63,20 +66,33 @@ public class ArticleService {
         List<ArticleQueryRow> list = total==0
                 ?List.of()
                 :articleMapper.queryArticles(currentUserId, keyword, pageSize, offset);
-        return new PageResult<>(list,total,pageSize,pageNumber);
+        return new PageResult<>(withTags(list),total,pageSize,pageNumber);
     }
 
-    public List<ArticleQueryRow> queryArticlesByAuthorId(Long currentUserId){
-        return  articleMapper.queryArticlesByAuthorId(currentUserId);
+    public List<ArticleQueryRow> queryArticlesByAuthorId(Long currentUserId, Long authorId){
+        return withTags(articleMapper.queryArticlesByAuthorId(currentUserId, authorId));
     }
 
     public List<ArticleQueryRow> queryArticlesByFavoriteUser(Long currentUserId){
-        return articleMapper.queryArticlesByFavoriteUser(currentUserId);
+        return withTags(articleMapper.queryArticlesByFavoriteUser(currentUserId));
     }
 
 
     public ArticleQueryRow getArticleDetailBySlug(Long currentUserId, String slug){
-        return articleMapper.queryArticleDetail(currentUserId, slug);
+        ArticleQueryRow article = articleMapper.queryArticleDetail(currentUserId, slug);
+        if (article != null) withTags(List.of(article));
+        return article;
+    }
+
+    private List<ArticleQueryRow> withTags(List<ArticleQueryRow> articles) {
+        if (articles.isEmpty()) return articles;
+        List<Long> articleIds = articles.stream().map(ArticleQueryRow::getId).toList();
+        // 批量加载，避免列表中每篇文章单独查询标签。
+        Map<Long, List<String>> tagsByArticle = articleMapper.queryArticleTags(articleIds).stream()
+                .collect(Collectors.groupingBy(ArticleTag::getArticleId,
+                        Collectors.mapping(ArticleTag::getName, Collectors.toList())));
+        articles.forEach(article -> article.setTags(tagsByArticle.getOrDefault(article.getId(), List.of())));
+        return articles;
     }
 
     public int deleteArticle(Long articleId){

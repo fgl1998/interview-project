@@ -18,7 +18,7 @@
           <u-textarea
             v-model="form.description"
             placeholder="用一两句话介绍文章内容"
-            maxlength="100"
+            maxlength="255"
             count
             :disabled="submitting"
           />
@@ -36,7 +36,7 @@
       </u-form>
 
       <view class="tag-section">
-        <view class="field-label">标签（可选）</view>
+        <view class="field-label">标签（至少选择一个）</view>
         <view v-if="tagsLoading" class="tag-state">正在加载标签…</view>
         <view v-else-if="tags.length" class="tag-options">
           <view
@@ -49,14 +49,14 @@
             {{ tag.name }}
           </view>
         </view>
-        <view v-else class="tag-state">暂无可选标签，可以直接发布。</view>
+        <view v-else class="tag-state" @click="loadTags">暂无可选标签，请添加标签后点击重试。</view>
       </view>
 
       <u-button
         type="primary"
         shape="circle"
         :loading="submitting"
-        :disabled="submitting"
+        :disabled="submitting || tagsLoading || !selectedTagIds.length"
         @click="submitArticle"
       >
         {{ submitting ? '发布中…' : '发布文章' }}
@@ -69,7 +69,6 @@
 const articleApi = require('../../api/article')
 const tagApi = require('../../api/tag')
 const session = require('../../common/session')
-const { normalizeArticle } = require('../../common/article')
 
 export default {
   data() {
@@ -127,8 +126,9 @@ export default {
       if (!title) return '请输入文章标题'
       if (title.length > 100) return '标题不能超过 100 个字符'
       if (!description) return '请输入文章摘要'
-      if (description.length > 100) return '摘要不能超过 100 个字符'
+      if (description.length > 255) return '摘要不能超过 255 个字符'
       if (!body) return '请输入文章正文'
+      if (!this.selectedTagIds.length) return '请至少选择一个标签'
       return ''
     },
     async submitArticle() {
@@ -141,17 +141,16 @@ export default {
 
       this.submitting = true
       try {
-        const result = await articleApi.create({
+        await articleApi.create({
           title: this.form.title.trim(),
           description: this.form.description.trim(),
           body: this.form.body.trim(),
-          tags: JSON.stringify(this.selectedTagIds),
+          tagsId: this.selectedTagIds,
         })
-        const article = normalizeArticle(result)
-        if (!article.slug) throw new Error('文章发布成功，但未返回文章地址')
         uni.showToast({ title: '发布成功', icon: 'success' })
+        // Java 创建接口返回文章 ID；从我的文章列表可继续查看详情。
         uni.redirectTo({
-          url: `/pages/article/detail?slug=${encodeURIComponent(article.slug)}`,
+          url: '/pages/article/list?type=mine',
         })
       } catch (error) {
         this.showError((error && error.message) || '文章发布失败')

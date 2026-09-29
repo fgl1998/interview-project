@@ -94,6 +94,46 @@ function rawComment(id, body) {
   }
 }
 
+test('article creation submits tag IDs and accepts a Java numeric article ID', async () => {
+  const calls = []
+  const toasts = []
+  const urls = []
+  const { instance } = loadPage('pages/article/create.vue', {
+    '../../api/article': { create: async (body) => { calls.push(body); return 42 } },
+    '../../api/tag': {},
+    '../../common/session': {},
+  }, {
+    showToast: (toast) => toasts.push(toast),
+    redirectTo: ({ url }) => urls.push(url),
+  })
+  instance.form = { title: ' Java ', description: 'Summary', body: 'Content' }
+  instance.selectedTagIds = [1, 3]
+  await instance.submitArticle()
+  assert.deepEqual(calls, [{ title: 'Java', description: 'Summary', body: 'Content', tagsId: [1, 3] }])
+  assert.deepEqual(urls, ['/pages/article/list?type=mine'])
+  assert.equal(toasts.length, 1)
+  assert.equal(toasts[0].icon, 'success')
+  assert.equal(instance.submitting, false)
+})
+
+test('article creation requires a tag and accepts Java description length up to 255', async () => {
+  let requests = 0
+  const { instance } = loadPage('pages/article/create.vue', {
+    '../../api/article': { create: async () => { requests += 1; return 42 } },
+    '../../api/tag': {},
+    '../../common/session': {},
+  }, { showToast() {}, redirectTo() {} })
+  instance.form = { title: 'Java', description: 'Summary', body: 'Content' }
+  assert.match(instance.validateForm(), /标签/)
+  await instance.submitArticle()
+  assert.equal(requests, 0)
+  instance.selectedTagIds = [1]
+  instance.form.description = 'a'.repeat(255)
+  assert.equal(instance.validateForm(), '')
+  instance.form.description += 'a'
+  assert.match(instance.validateForm(), /255/)
+})
+
 test('login page opens the registration page for users without an account', () => {
   const urls = []
   const { instance } = loadPage('pages/login/login.vue', {

@@ -64,13 +64,21 @@ public class ArticleController {
     }
 
     /**
-     * 查询当前用户发布的文章
+     * 查询指定作者的文章，authorId 必填；查询自己的文章也需传当前用户 ID
      */
     @PostMapping("/queryArticlesByAuthorId")
-    public Result<List<ArticleQueryRow>> queryArticlesByAuthorId(HttpServletRequest httpServletRequest){
-
+    public Result<List<ArticleQueryRow>> queryArticlesByAuthorId(
+            @RequestBody Map<String, Long> body,
+            HttpServletRequest httpServletRequest){
         Long currentUserId = (Long) httpServletRequest.getAttribute("currentUserId");
-        List<ArticleQueryRow> articleQueryRows = articleService.queryArticlesByAuthorId(currentUserId);
+        Long authorId = body.get("authorId");
+        if (authorId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "AUTHOR_ID", "作者 ID 不能为空");
+        }
+        if (authorId <= 0) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "AUTHOR_ID", "作者 ID 必须大于 0");
+        }
+        List<ArticleQueryRow> articleQueryRows = articleService.queryArticlesByAuthorId(currentUserId, authorId);
         return Result.success(articleQueryRows);
     }
 

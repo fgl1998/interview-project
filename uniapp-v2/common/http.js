@@ -70,7 +70,7 @@ function createHttpClient(options) {
   const requestAdapter = settings.requestAdapter || createRequestAdapter()
   const getToken = settings.getToken || session.getToken
   const onUnauthorized = settings.onUnauthorized || createUnauthorizedHandler()
-  const baseUrl = settings.baseUrl || BASE_URL
+  const baseUrl = settings.baseUrl === undefined ? BASE_URL : settings.baseUrl
 
   async function request(path, data, requestOptions) {
     const extraOptions = requestOptions || {}
@@ -84,7 +84,7 @@ function createHttpClient(options) {
     try {
       response = await requestAdapter({
         url: joinUrl(baseUrl, path),
-        method: 'POST',
+        method: extraOptions.method || 'POST',
         data: data || {},
         header,
         ...(extraOptions.timeout === undefined ? {} : { timeout: extraOptions.timeout }),
@@ -111,6 +111,10 @@ function createHttpClient(options) {
     }
 
     if (body.success === false) {
+      // Java 后台的认证异常也使用 HTTP 200，由业务码表示登录过期。
+      if (Number(errorBody.code) === 401 && getToken() === token) {
+        await onUnauthorized()
+      }
       throw createError(errorBody.message || '业务请求失败', { code: errorBody.code, statusCode })
     }
 
