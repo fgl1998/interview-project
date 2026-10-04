@@ -16,20 +16,15 @@ const ArticleDetailSchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
   body: z.string(),
-  author_id: z.number(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  author_username: z.string(),
-  author_bio: z.string().nullable(),
-  author_image: z.string().nullable(),
-  following: z.number(),
-  favorited: z.number(),
-  favorites_count: z.number(),
-  tags: z.array(z.object({
-    tag_id: z.number(),
-    tag_name: z.string(),
-    article_id: z.number(),
-  })),
+  authorId: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  authorUsername: z.string(),
+  authorBio: z.string().nullable(),
+  authorImage: z.string().nullable(),
+  favorited: z.boolean(),
+  favoritesCount: z.number(),
+  tags: z.array(z.string()),
 })
 
 const GetArticleDetailToolResponssSchema = z.union([
@@ -47,18 +42,17 @@ export interface CreateGetArticleDetailTool extends SecureToolContext {
 }
 export function createGetArticleDetailTool(
   options: CreateGetArticleDetailTool
-) { 
-  const { realWorldClient, token,currentUserId } = options
-  
+) {
+  const { realWorldClient, token } = options
+
   return tool(
-    async ({slug})=>{
+    async ({ slug }) => {
       const response = await realWorldClient.request({
-        path: '/api/articles/detail',
+        path: '/api/articles/getArticleDetailBySlug',
         method: 'POST',
         token,
         body: {
-          slug,
-          currentUserId
+          slug
         }
       })
       const detail = GetArticleDetailToolResponssSchema.parse(response)

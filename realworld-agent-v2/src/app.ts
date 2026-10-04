@@ -40,7 +40,11 @@ export function createApp() {
   })
 
   const authMiddleware = createAuthMiddleware(
-    env.JWT_SECRET
+    env.JWT_SECRET,
+    {
+      realWorldApiUrl: env.REALWORLD_API_URL,
+      timeoutMs: env.REALWORLD_API_TIMEOUT_MS,
+    }
   )
 
   const agentTraceLogger = new AgentTraceLogger({

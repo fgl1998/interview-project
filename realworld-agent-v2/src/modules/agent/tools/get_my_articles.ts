@@ -9,22 +9,22 @@ const ArticleSchema = z.object({
   description: z.string(),
   body: z.string(),
   slug: z.string(),
-  favorites_count: z
+  favoritesCount: z
     .number()
     .int()
     .nonnegative(),
-  createdAt: z.string(),
   updatedAt: z.string(),
-  author_id: z.number().int().positive(),
-  author_username: z.string(),
-  author_bio: z.string().nullable(),
-  author_image: z.string().nullable(),
+  // author_id: z.number().int().positive(),
+  // author_username: z.string(),
+  // author_bio: z.string().nullable(),
+  // author_image: z.string().nullable(),
 })
+
 
 const ArticleListResponseSchema = z.object({
   success: z.boolean(),
-  code: z.string(),
-  data: z.array(ArticleSchema),
+  code: z.number(),
+  data: z.array(ArticleSchema).nullable(),
 })
 
 export interface CreateGetArticleByUserIdTool {
@@ -35,20 +35,21 @@ export interface CreateGetArticleByUserIdTool {
 
 export function createGetArticleByUserIdTool(
   options: CreateGetArticleByUserIdTool
-) { 
-  const { realWorldClient, token,currentUserId } = options
-  
+) {
+  const { realWorldClient, token, currentUserId } = options
+
   return tool(
-    async ()=>{
+    async () => {
       const response = await realWorldClient.request({
-        path: '/api/articles/getArticleListByUserId',
+        path: '/api/articles/queryArticlesByAuthorId',
         method: 'POST',
         token,
         body: {
-          userId:currentUserId
+          authorId: currentUserId
         }
       })
-      
+
+
       const detail = ArticleListResponseSchema.parse(response)
       return JSON.stringify(detail)
     },

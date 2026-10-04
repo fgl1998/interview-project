@@ -13,7 +13,7 @@ const TagSchema = z.object({
 
 const TagListResponseSchema = z.object({
   success: z.boolean(),
-  code: z.string(),
+  code: z.number(),
   data: z.array(TagSchema),
 })
 

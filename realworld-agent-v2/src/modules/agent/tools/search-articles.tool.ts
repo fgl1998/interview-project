@@ -64,11 +64,15 @@ const ArticleSchema = z.object({
 
   slug: z.string(),
 
-  author: AuthorSchema,
+  authorUsername: z.string(),
+  authorBio: z.string().nullable(),
+  authorImage: z.string().nullable(),
+  authorId: z.number(),
 
-  tags: z.array(TagSchema),
 
-  favorited: z.number(),
+  tags: z.array(z.string()),
+
+  favorited: z.boolean(),
 
   favoritesCount: z
     .number()
@@ -88,7 +92,7 @@ const ArticlePageSchema = z.object({
     .int()
     .nonnegative(),
 
-  page: z
+  pageNumber: z
     .number()
     .int()
     .min(1),
@@ -131,12 +135,12 @@ export function createSearchArticlesTool(
   return tool(
     async ({ keyword, page, pageSize }) => {
       const response = await realWorldClient.request({
-        path: '/api/articles/list',
+        path: '/api/articles/queryArticles',
         method: 'POST',
         token,
 
         body: {
-          page,
+          pageNum: page,
           pageSize,
 
           // Agent内部使用keyword，
@@ -144,12 +148,12 @@ export function createSearchArticlesTool(
           keyWord: keyword,
         },
       })
-      console.log('response',response);
-      
+      console.log('response', response);
+
 
       const articlePage =
         ArticleListResponseSchema.parse(response)
-        
+
       const result = {
         items: articlePage.items.map((article) => {
           return {
@@ -159,12 +163,15 @@ export function createSearchArticlesTool(
             description: article.description,
 
             author: {
-              username: article.author.username,
+              username: article.authorUsername,
+              bio: article.authorBio,
+              image: article.authorImage,
+              id: article.authorId,
             },
 
-            tags: article.tags.map((tag) => tag.name),
+            tags: article.tags,
 
-            favorited: article.favorited === 1,
+            favorited: article.favorited,
             favoritesCount: article.favoritesCount,
 
             createdAt: article.createdAt,
@@ -174,14 +181,14 @@ export function createSearchArticlesTool(
 
         pagination: {
           total: articlePage.total,
-          page: articlePage.page,
+          page: articlePage.pageNumber,
           pageSize: articlePage.pageSize,
           totalPages: articlePage.totalPages,
         },
       }
 
-      console.log(result,'result');
-      
+      console.log(result, 'result');
+
 
       return JSON.stringify(result)
     },
@@ -198,5 +205,5 @@ export function createSearchArticlesTool(
         搜索结果仅作为分析参考，不得复制其他文章的大段内容。
         `.trim()
     },
-  ) 
+  )
 }

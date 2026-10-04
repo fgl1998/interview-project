@@ -6,14 +6,15 @@ const ToolInput = z.object({
   title: z.string().trim().min(1).max(100),
   description: z.string().trim().min(1).max(100),
   body: z.string().trim().min(1),
-  tags: z.string().trim().min(1).max(100).describe(
-      '从 list_available_tags 返回结果中选择的标签 ID'
-    ),
+  tagsId: z.array(z.number().int().positive()).describe(
+    '从 list_available_tags 返回结果中选择的标签 ID'
+  ),
 })
 
 const CreateResponseSchema = z.object({
   success: z.boolean(),
-  code: z.string(),
+  code: z.number(),
+  data: z.number().int().positive(),
 })
 
 export interface CreateMyArticleTool {
@@ -24,28 +25,28 @@ export interface CreateMyArticleTool {
 
 export function createMyArticleTool(
   options: CreateMyArticleTool
-) { 
-  const { realWorldClient, token,currentUserId } = options
-  
+) {
+  const { realWorldClient, token, currentUserId } = options
+
   return tool(
-    async (input)=>{
+    async (input) => {
       const response = await realWorldClient.request({
         path: '/api/articles/create',
         method: 'POST',
         token,
         body: {
-          userId:currentUserId,
+          // userId:currentUserId,
           ...input
         }
       })
-      
+
       const detail = CreateResponseSchema.parse(response)
       return JSON.stringify(detail)
     },
     {
       name: 'create_my_article',
-      schema:ToolInput,
-     description: `
+      schema: ToolInput,
+      description: `
 发布当前登录用户的一篇全新文章。
 
 调用该工具会立即创建文章，不会中断流程，也不会自动等待用户确认。

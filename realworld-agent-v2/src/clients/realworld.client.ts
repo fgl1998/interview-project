@@ -47,6 +47,8 @@ export class RealWorldClient {
       headers['content-type'] = 'application/json'
     }
 
+    console.log(`RealWorldClient: ${method} ${url}`)
+    console.log(`Body: ${JSON.stringify(options.body)}`)
     try {
       const response = await fetch(url, {
         method,

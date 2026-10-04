@@ -3,18 +3,20 @@ import { z } from 'zod'
 import type { RealWorldClient } from '../../../clients/realworld.client.js'
 
 const ToolInput = z.object({
-  articleId:z.number().describe('目标文章的数据库 ID'),
+  articleId: z.number().describe('目标文章的数据库 ID'),
 })
 
 
 const CommentSchema = z.object({
-  article_id:z.number(),
-  body:z.string()
+  authorId: z.number(),
+  articleId: z.number(),
+  authorUsername: z.string(),
+  body: z.string()
 })
 
 const CommentListResponseSchema = z.object({
   success: z.boolean(),
-  code: z.string(),
+  code: z.number(),
   data: z.array(CommentSchema),
 })
 
@@ -26,27 +28,28 @@ export interface CreateGetArticleCommentTool {
 
 export function createGetArticleCommentTool(
   options: CreateGetArticleCommentTool
-) { 
-  const { realWorldClient, token,currentUserId } = options
-  
+) {
+  const { realWorldClient, token, currentUserId } = options
+
   return tool(
-    async ({articleId})=>{
+    async ({ articleId }) => {
       const response = await realWorldClient.request({
-        path: '/api/articles/comment/list',
+        path: '/api/articles/comment/queryComments',
         method: 'POST',
         token,
         body: {
-          userId:currentUserId,
+          // userId:currentUserId,
           articleId
         }
       })
-      
+
       const detail = CommentListResponseSchema.parse(response)
+      console.log('get_article_comments response:', detail)
       return JSON.stringify(detail)
     },
     {
       name: 'get_article_comments',
-      schema:ToolInput,
+      schema: ToolInput,
       description: `
         查询指定文章的评论列表，用于分析读者反馈、疑问和负面评价。
 
