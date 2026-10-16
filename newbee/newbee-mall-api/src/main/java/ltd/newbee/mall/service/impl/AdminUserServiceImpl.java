@@ -25,14 +25,19 @@ import java.util.Date;
 @Service
 public class AdminUserServiceImpl implements AdminUserService {
 
-    @Resource
-    private AdminUserMapper adminUserMapper;
 
-    @Resource
-    private NewBeeAdminUserTokenMapper newBeeAdminUserTokenMapper;
+    private final AdminUserMapper adminUserMapper;
+
+    private final NewBeeAdminUserTokenMapper newBeeAdminUserTokenMapper;
+
+    public AdminUserServiceImpl(AdminUserMapper adminUserMapper, NewBeeAdminUserTokenMapper newBeeAdminUserTokenMapper) {
+        this.adminUserMapper = adminUserMapper;
+        this.newBeeAdminUserTokenMapper = newBeeAdminUserTokenMapper;
+    }
 
     @Override
     public String login(String userName, String password) {
+
         AdminUser loginAdminUser = adminUserMapper.login(userName, password);
         if (loginAdminUser != null) {
             //登录后即执行修改token的操作

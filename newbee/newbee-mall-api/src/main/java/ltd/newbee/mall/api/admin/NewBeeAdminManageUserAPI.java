@@ -42,10 +42,14 @@ import javax.validation.Valid;
 @RequestMapping("/manage-api/v1")
 public class NewBeeAdminManageUserAPI {
 
-    @Resource
-    private AdminUserService adminUserService;
+
+    private final AdminUserService adminUserService;
 
     private static final Logger logger = LoggerFactory.getLogger(NewBeeAdminManageUserAPI.class);
+
+    public NewBeeAdminManageUserAPI(AdminUserService adminUserService){
+        this.adminUserService = adminUserService;
+    }
 
     @RequestMapping(value = "/adminUser/login", method = RequestMethod.POST)
     public Result<String> login(@RequestBody @Valid AdminLoginParam adminLoginParam) {

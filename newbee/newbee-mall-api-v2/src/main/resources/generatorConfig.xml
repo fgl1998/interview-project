@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "https://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <context id="MySQL" targetRuntime="MyBatis3">
+
+        <!-- 关闭 MBG 自动生成的注释 -->
+        <commentGenerator>
+            <!-- 去除所有自动生成的注释 -->
+            <property name="suppressAllComments" value="true"/>
+            <!-- 去除注释中的时间戳 -->
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+
+        <!-- 连接 MySQL 数据库 -->
+        <jdbcConnection
+                driverClass="com.mysql.cj.jdbc.Driver"
+                connectionURL="jdbc:mysql://localhost:3306/newbee_mall_db_v2?serverTimezone=Asia/Shanghai&amp;characterEncoding=UTF-8"
+                userId="root"
+                password="123456Aa!"/>
+
+        <!-- Java 实体类生成位置 -->
+        <javaModelGenerator
+                targetPackage="com.example.newbeemallapiv2.entity"
+                targetProject="src/main/java">
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- Mapper XML 生成位置 -->
+        <sqlMapGenerator
+                targetPackage="mapper"
+                targetProject="src/main/resources"/>
+
+        <!-- Mapper 接口生成位置 -->
+        <javaClientGenerator
+                type="XMLMAPPER"
+                targetPackage="com.example.newbeemallapiv2.dao"
+                targetProject="src/main/java"/>
+
+        <!-- 只生成指定的数据表 -->
+<!--        <table tableName="tb_newbee_mall_admin_user" domainObjectName="AdminUser"/>-->
+        <table tableName="tb_newbee_mall_admin_user" domainObjectName="AdminUser"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+    </context>
+</generatorConfiguration>

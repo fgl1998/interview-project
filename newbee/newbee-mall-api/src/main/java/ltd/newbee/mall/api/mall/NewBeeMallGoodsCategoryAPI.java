@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import ltd.newbee.mall.common.NewBeeMallException;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.api.mall.vo.NewBeeMallIndexCategoryVO;
+import ltd.newbee.mall.service.NewBeeMallCarouselService;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -24,20 +25,26 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static ltd.newbee.mall.common.NewBeeMallException.fail;
+
 @RestController
 @Api(value = "v1", tags = "3.新蜂商城分类页面接口")
 @RequestMapping("/api/v1")
 public class NewBeeMallGoodsCategoryAPI {
 
-    @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private final NewBeeMallCategoryService newBeeMallCategoryService;
+
+    //构造器注入
+    public NewBeeMallGoodsCategoryAPI(NewBeeMallCategoryService newBeeMallCategoryService){
+        this.newBeeMallCategoryService = newBeeMallCategoryService;
+    }
 
     @GetMapping("/categories")
     @ApiOperation(value = "获取分类数据", notes = "分类页面使用")
     public Result<List<NewBeeMallIndexCategoryVO>> getCategories() {
         List<NewBeeMallIndexCategoryVO> categories = newBeeMallCategoryService.getCategoriesForIndex();
         if (CollectionUtils.isEmpty(categories)) {
-            NewBeeMallException.fail(ServiceResultEnum.DATA_NOT_EXIST.getResult());
+            fail(ServiceResultEnum.DATA_NOT_EXIST.getResult());
         }
         return ResultGenerator.genSuccessResult(categories);
     }

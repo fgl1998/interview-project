@@ -16,7 +16,6 @@ import ltd.newbee.mall.service.NewBeeMallCarouselService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -27,9 +26,10 @@ import java.util.List;
 @Service
 public class NewBeeMallCarouselServiceImpl implements NewBeeMallCarouselService {
 
-    @Autowired
-    private CarouselMapper carouselMapper;
-
+    private final CarouselMapper carouselMapper;
+    public NewBeeMallCarouselServiceImpl(CarouselMapper carouselMapper) {
+        this.carouselMapper = carouselMapper;
+    }
 
     @Override
     public PageResult getCarouselPage(PageQueryUtil pageUtil) {

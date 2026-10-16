@@ -31,11 +31,14 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class NewBeeMallIndexAPI {
 
-    @Resource
-    private NewBeeMallCarouselService newBeeMallCarouselService;
+    private final NewBeeMallCarouselService newBeeMallCarouselService;
 
-    @Resource
-    private NewBeeMallIndexConfigService newBeeMallIndexConfigService;
+    private final NewBeeMallIndexConfigService newBeeMallIndexConfigService;
+
+    public NewBeeMallIndexAPI(NewBeeMallCarouselService newBeeMallCarouselService, NewBeeMallIndexConfigService newBeeMallIndexConfigService) {
+        this.newBeeMallCarouselService = newBeeMallCarouselService;
+        this.newBeeMallIndexConfigService = newBeeMallIndexConfigService;
+    }
 
     @GetMapping("/index-infos")
     @ApiOperation(value = "获取首页数据", notes = "轮播图、新品、推荐等")
