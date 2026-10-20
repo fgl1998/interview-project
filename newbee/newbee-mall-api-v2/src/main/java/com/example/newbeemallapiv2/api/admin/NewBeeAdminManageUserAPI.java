@@ -4,6 +4,7 @@ import ch.qos.logback.core.util.StringUtil;
 import com.example.newbeemallapiv2.api.admin.param.AdminLoginParam;
 import com.example.newbeemallapiv2.common.Constants;
 import com.example.newbeemallapiv2.common.ServiceResultEnum;
+import com.example.newbeemallapiv2.config.annotation.TokenToAdminUser;
 import com.example.newbeemallapiv2.entity.AdminUser;
 import com.example.newbeemallapiv2.entity.AdminUserToken;
 import com.example.newbeemallapiv2.service.AdminManageUserService;
@@ -53,9 +54,9 @@ public class NewBeeAdminManageUserAPI {
     }
 
     @RequestMapping(value = "/adminUser/profile", method = RequestMethod.GET)
-    public Result profile(HttpServletRequest request) {
-        String token= request.getHeader("token");
-        AdminUserToken adminUserToken = adminUserInfoByToken.getAdminUserToken(token);
+    public Result profile(HttpServletRequest request, @TokenToAdminUser AdminUserToken adminUserToken) {
+//        String token= request.getHeader("token");
+//        AdminUserToken adminUserToken = adminUserInfoByToken.getAdminUserToken(token);
 
 //        AdminUserToken adminUserToken = new AdminUserToken();
 //        adminUserToken.setAdminUserId(1L);

@@ -41,7 +41,7 @@ public class TokenToAdminUserMethodArgumentResolver implements HandlerMethodArgu
                 } else if (adminUserToken.getExpireTime().getTime() <= System.currentTimeMillis()) {
                     NewBeeMallException.fail(ServiceResultEnum.ADMIN_TOKEN_EXPIRE_ERROR.getResult());
                 } else {
-                    return token;
+                    return adminUserToken;
                 }
             } else {
                 NewBeeMallException.fail(ServiceResultEnum.ADMIN_NOT_LOGIN_ERROR.getResult());
