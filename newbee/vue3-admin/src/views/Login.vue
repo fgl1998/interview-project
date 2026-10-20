@@ -54,7 +54,7 @@ const submitForm = async () => {
         passwordMd5: md5(state.ruleForm.password)
       }).then(res => {
         localSet('token', res)
-        // window.location.href = '/'
+        window.location.href = '/'
       })
     } else {
       console.log('error submit!!')

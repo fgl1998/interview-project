@@ -1,10 +1,15 @@
 package com.example.newbeemallapiv2.util;
 
+import com.example.newbeemallapiv2.dao.AdminUserMapper;
+import com.example.newbeemallapiv2.dao.AdminUserTokenMapper;
+import com.example.newbeemallapiv2.entity.AdminUserToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class SystemUtil {
-
     /**
      * 生成token
      * @param src

@@ -42,7 +42,7 @@
 
         <!-- 只生成指定的数据表 -->
 <!--        <table tableName="tb_newbee_mall_admin_user" domainObjectName="AdminUser"/>-->
-        <table tableName="tb_newbee_mall_admin_user" domainObjectName="AdminUser"
+        <table tableName="tb_newbee_mall_admin_user_token" domainObjectName="AdminUserToken"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"
@@ -51,3 +51,4 @@
 
     </context>
 </generatorConfiguration>
+<!--        mvn mybatis-generator:generate -s "D:\apache-maven-3.8.6-bin\apache-maven-3.8.6\conf\settings3.xml"-->
