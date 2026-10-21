@@ -42,7 +42,7 @@
 
         <!-- 只生成指定的数据表 -->
 <!--        <table tableName="tb_newbee_mall_admin_user" domainObjectName="AdminUser"/>-->
-        <table tableName="tb_newbee_mall_admin_user_token" domainObjectName="AdminUserToken"
+        <table tableName="tb_newbee_mall_carousel" domainObjectName="Carousel"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"

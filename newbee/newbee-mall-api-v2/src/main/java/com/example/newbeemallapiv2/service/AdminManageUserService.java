@@ -4,7 +4,7 @@ import com.example.newbeemallapiv2.entity.AdminUser;
 
 public interface AdminManageUserService {
     /**
-     * 管登录
+     * 登录
      * @param username
      * @param password
      * @return
@@ -17,4 +17,11 @@ public interface AdminManageUserService {
      * @return
      */
     AdminUser getUserDetailById(Long loginUserId);
+
+    /**
+     * 退出登录
+     * @param loginUserId
+     * @return
+     */
+    Boolean logout(Long loginUserId);
 }

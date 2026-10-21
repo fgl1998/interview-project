@@ -73,4 +73,10 @@ public class NewBeeAdminManageUserAPI {
         }
         return ResultGenerator.genFailResult(ServiceResultEnum.DATA_NOT_EXIST.getResult());
     }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.DELETE)
+    public Result logout(@TokenToAdminUser AdminUserToken adminUserToken){
+        adminManageUserService.logout(adminUserToken.getAdminUserId());
+        return ResultGenerator.genSuccessResult();
+    }
 }

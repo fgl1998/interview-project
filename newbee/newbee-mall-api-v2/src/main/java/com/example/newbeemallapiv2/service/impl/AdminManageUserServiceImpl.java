@@ -64,4 +64,9 @@ public class AdminManageUserServiceImpl implements AdminManageUserService {
     public AdminUser getUserDetailById(Long loginUserId){
         return adminUserMapper.selectByPrimaryKey(loginUserId);
     }
+
+    @Override
+    public Boolean logout(Long loginUserId){
+        return adminUserTokenMapper.deleteByPrimaryKey(loginUserId)>0;
+    }
 }
