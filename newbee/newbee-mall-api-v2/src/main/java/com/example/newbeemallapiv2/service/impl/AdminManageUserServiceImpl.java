@@ -36,7 +36,7 @@ public class AdminManageUserServiceImpl implements AdminManageUserService {
             String token=getNewToken(System.currentTimeMillis()+"",adminUser.getAdminUserId());
             AdminUserToken adminUserToken= adminUserTokenMapper.selectByPrimaryKey(adminUser.getAdminUserId());
             Date now=new Date();
-            Date expireTime=new Date(now.getTime()+1000*60*2);
+            Date expireTime=new Date(now.getTime()+1000*60*5);
             if(adminUserToken == null){
                 adminUserToken=new AdminUserToken();
                 adminUserToken.setAdminUserId(adminUser.getAdminUserId());

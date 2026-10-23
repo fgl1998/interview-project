@@ -23,8 +23,8 @@ public class NewBeeAdminCarouselAPI {
     }
 
     @RequestMapping(value = "/carousels", method = RequestMethod.GET)
-    public Result list(Integer pageNumner, Integer pageSize, @TokenToAdminUser AdminUserToken adminUserToken) {
-        PageQueryUtil pageUtil=new PageQueryUtil(pageNumner,pageSize);
+    public Result list(Integer pageNumber, Integer pageSize, @TokenToAdminUser AdminUserToken adminUserToken) {
+        PageQueryUtil pageUtil=new PageQueryUtil(pageNumber,pageSize);
         PageResult pageResult= newBeeMallCarouselService.getCarouselPage(pageUtil);
         return ResultGenerator.genSuccessResult(pageResult);
     }
